@@ -1,0 +1,25 @@
+SELECT 
+  "sourceIP" AS "Source IP", 
+  QIDNAME(qid) AS "Event Name", 
+   CATEGORYNAME(category) AS "Low Level Category", 
+   "Action" AS "Action (custom)", 
+   "Policy Name" AS "Policy Name", 
+  DATEFORMAT(starttime, 'YYYY-MM-dd hh:mm:ss') AS "Time", 
+  COUNT(*) AS "Count" ,
+  LOGSOURCENAME(logSourceId) AS "Log Source", 
+  "sourcePort" AS "Source Port", 
+  "destinationIP" AS "Destination IP", 
+  "destinationPort" AS "Destination Port", 
+  "URL Host" AS "URL Host"
+FROM events 
+WHERE 
+  logSourceId IN (119, 184, 204, 299, 497, 655, 858, 2281)
+    AND sourceIP NOT IN ('51.89.201.157', '51.195.160.144', '135.125.59.105', '5.135.248.22', '54.38.75.19', '54.38.144.28', '51.68.205.115', '51.77.118.166', '82.165.120.165', '146.59.209.236', '178.33.149.170', '87.98.141.191', '51.38.250.32'
+)
+  AND QIDNAME(qid) NOT IN ('POST', 'GET', 'OPTIONS', 'PUT', 'HEAD', 'Illegal POST Data Length', 'Illegal cross-origin request', 'Illegal Request Length')
+  AND (QIDNAME(qid) NOT IN('HTTP Compliance Failure') AND "Policy Name"  NOT IN ('#POLICY NAME'))
+AND "eventDirection" = 'R2L'
+GROUP BY
+  "Action",  "sourceIP",  "Policy Name"
+ORDER BY "Count" DESC 
+LAST 30 MINUTES
